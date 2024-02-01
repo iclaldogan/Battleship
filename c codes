@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define BoardSize 10 
+#define ShipNum 6
+
+void gameBoard(char board[BoardSize][BoardSize], char hiddenBoard[BoardSize][BoardSize]) {
+    for(int i = 0; i < BoardSize; i++) {
+        for(int j = 0; j < BoardSize; j++) {
+            board[i][j] = 'O';
+            hiddenBoard[i][j] = 'O';
+        }
+    }
+}
+
+void placeShips(char board[BoardSize][BoardSize]) {
+    int count = 0;
+    int x, y;
+    
+    while(count < ShipNum) {
+        printf("Geminizin %d. Parcasini Yerlestirin (1 1 gibi) : ", count + 1);
+        scanf("%d %d", &x, &y);
+        
+        if (board[x][y] != 'x') {
+            board[x][y] = 'x';
+            count++;
+        }
+    }
+}
+
+void printBoard(char board[BoardSize][BoardSize]) {
+    for(int i = 0; i < BoardSize; i++) {
+        for(int j = 0; j < BoardSize; j++) {
+            printf("%c ", board[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void revealBoard(char board[BoardSize][BoardSize], char hiddenBoard[BoardSize][BoardSize], int x, int y) {
+    if (x < 0 || x >= BoardSize || y < 0 || y >= BoardSize || hiddenBoard[x][y] == 'O') {
+        return;
+    }
+    
+    hiddenBoard[x][y] = 'O';
+    
+    if (board[x][y] == 'x') {
+        hiddenBoard[x][y] = 'x';
+        for(int i = x - 1; i <= x + 1; i++) {
+            for(int j = y - 1; j <= y + 1; j++) {
+                revealBoard(board, hiddenBoard, i, j);
+            }
+        }
+    }
+    
+    else {
+    	hiddenBoard[x][y] = '  ';
+	}
+}
+
+int main() {
+    char board[BoardSize][BoardSize];
+    char hiddenBoard[BoardSize][BoardSize];
+    
+    gameBoard(board, hiddenBoard);
+    placeShips(board);
+    
+    int gameOver = 0;
+    
+    while (gameOver != ShipNum) {
+        printf("Oyun Tahtaniz:\n");
+        printBoard(hiddenBoard);
+        
+        int x, y;
+        printf("Lutfen gemiyi bulmak icin sutun ve satirlarinizi giriniz (1 1 gibi) : ");
+        scanf("%d %d", &x, &y);
+        
+        if (board[x][y] == 'x') {
+        	hiddenBoard[x][y] = 'x';
+            gameOver++;
+        } else {
+        	hiddenBoard[x][y] = ' ';
+            revealBoard(board, hiddenBoard, x, y);
+        }
+    }
+    
+    printf("\nKAZANDINIZ\nTahtanin Son Durumu:\n");
+    printBoard(board);
+    
+    return 0;    
+}
